@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-700">Overall Grade Calculator</h1>
+    
+    <form action="/" method="POST" class="space-y-8">
+        <!-- Student Name -->
+        <fieldset>
+            <label for="name" class="block text-xl font-semibold text-gray-800 mb-2">Student Name</label>
+            <input type="text" name="name" id="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        </fieldset>
+
+        <!-- Loop for all standard modules -->
+        {% for module_name, module_data in modules.items() %}
+            {% if module_data.type == 'standard' %}
+            <fieldset class="border-t pt-6">
+                <legend class="text-xl font-semibold text-gray-800 px-2">{{ module_name }}</legend>
+                <div class="space-y-4 mt-4">
+                {% for assessment_name, weight in module_data.assessments.items() %}
+                    <div>
+                        <!-- THIS IS THE LINE I CHANGED: I removed ({{ weight }}%) -->
+                        <label for="{{ module_name }}-{{ assessment_name }}" class="block text-md font-medium text-gray-700">{{ assessment_name }}</label>
+                        <input type="number" name="{{ module_name }}-{{ assessment_name }}" id="{{ module_name }}-{{ assessment_name }}" min="0" max="100" step="0.1" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                {% endfor %}
+                </div>
+            </fieldset>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Optional IELTS Section -->
+        <fieldset class="border-t pt-6">
+            <div class="relative flex items-start">
+                <div class="flex items-center h-5">
+                    <input id="include_ielts" name="include_ielts" type="checkbox" onchange="toggleIELTS()" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="include_ielts" class="font-medium text-gray-700">Include optional IELTS module?</label>
+                </div>
+            </div>
+            <div id="ielts-section" class="hidden mt-4 space-y-4">
+                <legend class="text-xl font-semibold text-gray-800 px-2">English for Academic Purposes (IELTS)</legend>
+                {% for assessment_name in modules['English for Academic Purposes (IELTS)'].assessments.keys() %}
+                <div>
+                    <label for="IELTS-{{ assessment_name }}" class="block text-md font-medium text-gray-700">{{ assessment_name }}</label>
+                    <input type="number" name="IELTS-{{ assessment_name }}" id="IELTS-{{ assessment_name }}" min="0" max="9" step="0.5" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                {% endfor %}
+            </div>
+        </fieldset>
+        
+        <script>
+            function toggleIELTS() {
+                const checkbox = document.getElementById('include_ielts');
+                const section = document.getElementById('ielts-section');
+                if (checkbox.checked) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            }
+        </script>
+
+        <!-- Submit Button -->
+        <div class="pt-5">
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Calculate Overall Grade
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
